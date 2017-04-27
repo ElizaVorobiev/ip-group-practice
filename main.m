@@ -4,7 +4,6 @@ img = fread(img_id, [320,440], 'int16', 0, 'l' );
 d0 = 1;
 filt_img = freq_filter_image(img,d0);
 [ segmented_mask, level, stats] = segment_image_otsu( img, 1, [0.74 0.74], 1.5);
-imshow(img,[])
 % fimg = fft2(double(img),320,440);
 % figure
 % fimg_shifted = abs(fftshift(fimg));
