@@ -6,28 +6,38 @@ function [ filt_img ] = freq_filter_image( img, D0 )
 
 % Create the fourier transform of the image
 imgDim = size(img);
-fimg_Original = fft2(double(img));
+fimg_Original = fft2(single(img));
 fimg = fftshift(fimg_Original);
-%fimg_shifted = abs(fftshift(fimg));
+
 % Create the mask using the formula
 H = zeros(imgDim(1),imgDim(2));
-% Go through each pixel and get H value
-% Note: should we be using fimg to create this H?\
-% D is the normalized distance to centre
- meanValue = mean(img(:));
+
+% find the centre of the fourier transform 
+% (Note we could also use: [centreX, centreY] =
+% [floor(imgY/2)+1,floor(imgX/2)+1]
+meanValue = mean(img(:));
 [centreX, centreY] = find(fimg == meanValue*(320*440));
 maxDistance = sqrt(centreX^2 + centreY^2);
-% this will always be imgY/2 + 1 for even 
+
+% use formula to fill in H for each pixel, where D is the normailized
+% distance to centre
 for x = 1:imgDim(1)
     for y = 1:imgDim(2)
-        H(x,y) = 1/(sqrt(1 + ((sqrt((x-centreX)^2 + (y-centreY)^2)./maxDistance)^2)/0.1)^(2*2));
+        H(x,y) = 1/(sqrt(1 + ((sqrt((x-centreX)^2 + (y-centreY)^2)./maxDistance)^2)/D0)^(2*2));
     end 
 end 
 
 % mulitpy img and mask in frequency domain
 filt_img_freq = fimg .* H;
+
+% shift the result back (since we shifted original fourier transform)
+% Then take the inverse fourier transform, take only the real values
 filt_img = real(ifft2(ifftshift(filt_img_freq)));
+
+% display image
 figure
 imshow(filt_img,[]);
+titleString = sprintf('Butterworth Filtered Image with Cutoff Frequency: %d',D0);
+title(titleString)
 end
 
