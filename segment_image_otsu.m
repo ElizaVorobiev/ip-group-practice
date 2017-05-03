@@ -42,11 +42,18 @@ for step = 1:otsu_steps
     
     % calculate the level based on max class variance, add the min value
     % and negative one since we shifted our histogram
-    level = (find(bcv == max(bcv)) + min(values(:))-1); 
+    level_position = find(bcv == max(bcv));
+    level = level_position + min(values(:))-1; 
+    
+    % display histogram being used
+    figure 
+    plot(hist);
+    strTitle = sprintf('Histogram for Otsu step %d, threshold position : %d',step,level_position);
+    title(strTitle)
     
     % create new histogram and values based on new threshold
-    values = values(level - min(image(:))+1:length(hist));
-    hist = hist(level - min(image(:))+1:length(hist));
+    values = values(level_position:length(hist));
+    hist = hist(level_position:length(hist));
 
 end
 
